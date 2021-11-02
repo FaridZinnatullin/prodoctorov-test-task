@@ -8,7 +8,6 @@ import sys
 def get_data(url):
     try:
         response = requests.get(url)
-        response.raise_for_status()
     except requests.exceptions.ConnectionError:
         print('Произошла ошибка подключения. Выполнение программы прервано')
         sys.exit()
