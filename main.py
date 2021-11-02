@@ -7,7 +7,8 @@ import sys
 
 def get_data(url):
     try:
-        response = requests.get(url)
+        response = requests.get('http://cdek.ru')
+        response.raise_for_status()
     except requests.exceptions.ConnectionError:
         print('Произошла ошибка подключения. Выполнение программы прервано')
         sys.exit()
@@ -26,18 +27,21 @@ def get_data(url):
     except requests.exceptions.RequestException:
         print('Не удалось подключиться к серверу. Выполнение программы прервано')
         sys.exit()
+    # На случай, если ответ был не в формате JSON и форматирование невозможно
+    try:
+        return response.json()
+    except:
+        print('Данные были получены в неверном формате. Выполнение программы прервано')
+        sys.exit()
 
-    return response.json()
-
-
-
+# Функция проверки и обрезки строки до нужной длины
 def crop_str(str):
     if len(str) > 48:
         return f'{str[:48]}...\n'
     return f'{str}\n'
 
-
-def create_file(data_todo, user):
+# Функция обработки данных, создания, переименования и редактирования отчетов
+def create_report(data_todo, user):
     # Списки завершенных и незавершенных задач
     user_task_completed = []
     user_task_uncompleted = []
@@ -78,6 +82,7 @@ def create_file(data_todo, user):
     else:
         writing_data += 'У пользователя отсутствуют любые задачи\n'
 
+    # Процесс сохранения, переменования и замены отчетов
     try:
         # Создаем новый отчет с префиксом new для последующей подмены
         with open(f'{username}_new.txt', 'w+') as user_file:
@@ -114,10 +119,13 @@ def create_file(data_todo, user):
         print('Произошел сбой записи/переименования файлов (Обновление разрешено не чаще, чем раз в минуту)')
 
 
+# Основное "тело программы"
 def main():
+    # URL'ы записываем в константы для удобной замены
     url_todos = 'https://json.medrating.org/todos'
     url_users = 'https://json.medrating.org/users'
 
+    # Получение данных через GET запросы
     data_todo = get_data(url_todos)
     data_users = get_data(url_users)
 
@@ -129,7 +137,7 @@ def main():
     # Проход по всем пользователям. Предполагается, что каждая запись - уникальный пользователь,
     # а также все поля словаря пользователей заполненны корректно
     for user in data_users:
-        create_file(data_todo, user)
+        create_report(data_todo, user)
 
 
 if __name__ == "__main__":
