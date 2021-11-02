@@ -48,6 +48,7 @@ def create_report(data_todo, user):
     # Дабы постоянно не повторять конструкцию .get('username') сразу сохраним в переменную
     username = user.get('username')
 
+
     # Проход циклом для поиска действий определенного пользователя
     for task in data_todo:
         if task.get('userId') == user.get('id'):
@@ -137,7 +138,12 @@ def main():
     # Проход по всем пользователям. Предполагается, что каждая запись - уникальный пользователь,
     # а также все поля словаря пользователей заполненны корректно
     for user in data_users:
-        create_report(data_todo, user)
+        # Так как для корректной работы программы требуется уникальное имя username для создания файла,
+        # при его отсутствии создание отчета невозможно
+        if user.get('username'):
+            create_report(data_todo, user)
+        else:
+            print('У пользователя отсутствует username')
 
 
 if __name__ == "__main__":
