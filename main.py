@@ -7,7 +7,7 @@ import sys
 
 def get_data(url):
     try:
-        response = requests.get('http://cdek.ru')
+        response = requests.get(url)
         response.raise_for_status()
     except requests.exceptions.ConnectionError:
         print('Произошла ошибка подключения. Выполнение программы прервано')
@@ -51,10 +51,10 @@ def create_report(data_todo, user):
     # Проход циклом для поиска действий определенного пользователя
     for task in data_todo:
         if task.get('userId') == user.get('id'):
-            if task['completed']:
-                user_task_completed.append(crop_str(task['title']))
+            if task.get('completed'):
+                user_task_completed.append(crop_str(task.get('title')))
             else:
-                user_task_uncompleted.append(crop_str(task['title']))
+                user_task_uncompleted.append(crop_str(task.get('title')))
 
     # Для минимизации количества процессов записи в файл, изначально данные будут записываться в переменную
     writing_data = f'Отчет для: {user.get("company").get("name")}.\n' \
